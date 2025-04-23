@@ -83,7 +83,7 @@ typedef enum : uint8_t {
 } DescriptorType ;
 
 int main() {
-	int my_fd = open("/dev/bus/usb/001/007", O_RDWR);
+	int my_fd = open("/dev/bus/usb/001/030", O_RDWR);
 
 	if (my_fd < 0) {
 		perror("Failed to open device");
@@ -162,7 +162,7 @@ int main() {
 	}
 	printf(" - ");
 
-	value = (string << 8) | 0;
+	value = (string << 8) | usb_desc.serial_number;
 	struct usbdevfs_ctrltransfer str_serial_req = {
 		.bRequestType = req_type.bits,
 		.bRequest = get_descriptor,
@@ -178,20 +178,6 @@ int main() {
 	for (int i = 2; i < size; i++) {
 		printf("%c", string_buf[i]);
 	}
-	printf("\n");
-
-	value = (string << 8) | 4;
-	struct usbdevfs_ctrltransfer set_descriptor = {
-		.bRequestType = 0,
-		.bRequest = get_descriptor,
-		.wValue = value,
-		.wIndex = langid,
-		.wLength = size-2,
-		.timeout = 1000,
-		.data = &string_buf
-	};
-	ret = ioctl(my_fd, USBDEVFS_CONTROL, &str_serial_req);
-	if (ret < 0) perror("GET STRING");
 	printf("\n");
 
 	close(my_fd);
